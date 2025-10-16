@@ -1,0 +1,113 @@
+---
+import "../styles/global.css";
+import words from "../data/words.json";
+import Navbar from "../components/Navbar.astro";
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📖</text></svg>"
+    />
+
+    <meta name="viewport" content="width=device-width" />
+    <title>Dizionario dialetto trentino</title>
+  </head>
+  <body class="min-h-screen">
+    <Navbar />
+
+    <div class="max-w-sm mx-auto px-3 mt-12 py-12">
+      <div class="text-center">
+        <h1 class="text-2xl">Salve!</h1>
+        <p class="mt-3">
+          Ci sono sacco di parole ({words.length}).
+        </p>
+      </div>
+
+      <div class="mt-3">
+        <input
+          type="text"
+          id="search"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+          placeholder="Esempio: balon"
+          required
+        />
+      </div>
+    </div>
+
+    <div
+      id="itemsContainer"
+      class="grid grid-cols-1 gap-3 max-w-sm mx-auto px-3"
+    >
+      {
+        words.map((w) => {
+          return (
+            <div class="item border border-gray-400 p-3 shadow rounded-2xl">
+              <div class="grid grid-cols-2 gap-3 text-center">
+                <p class="text-xs text-gray-600">Dialetto</p>
+                <p class="text-xs text-gray-600">Italiano</p>
+                <p class="text-lg search">{w.dialect}</p>
+                <p class="text-lg search">{w.italian}</p>
+              </div>
+              {w.meaning ? (
+                <div class="mt-3">
+                  <p class="mt-3 text-xs text-gray-600">Significato</p>
+                  <p class="">{w.meaning}</p>
+                </div>
+              ) : null}
+            </div>
+          );
+        })
+      }
+    </div>
+
+    <footer class="bg-gray-100 px-3 py-12 mt-12 text-center">
+      <p>
+        Creato e mantenuto da <a
+          class="underline"
+          href="https://lucafedrizzi.com">Luca Fedrizzi</a
+        >.
+      </p>
+      <p class="text-sm text-gray-700 mt-2">Trentino, 2025</p>
+    </footer>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const searchInput = document.getElementById("search");
+        const itemsContainer = document.getElementById("itemsContainer");
+        if (!itemsContainer || !searchInput) {
+          return;
+        }
+
+        const items = itemsContainer.getElementsByClassName("item");
+        searchInput.addEventListener("input", filterItems);
+
+        function filterItems() {
+          const filterText: string | null = searchInput?.value.toLowerCase();
+
+          for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+
+            const searchableElements = item.querySelectorAll(".search");
+
+            let combinedSearchContent = "";
+
+            searchableElements.forEach((element) => {
+              combinedSearchContent += element.textContent + " ";
+            });
+
+            const content = combinedSearchContent.trim().toLowerCase();
+
+            if (content.includes(filterText || "")) {
+              item.style.display = "block";
+            } else {
+              item.style.display = "none";
+            }
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
